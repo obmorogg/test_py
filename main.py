@@ -14,6 +14,9 @@ def getuserresp():
         print(f'{key}. {value}')
     print("Выберите действие: ")
     cse = m.getch()
+    #print(cse)
+    if cse in [b'\x03', b'\x1b']:
+        exit()
     return str(int(cse)) if cse in (b'1', b'2', b'3', b'4', b'5', b'6', b'0') else '-1'
 
 def printerr(err):
@@ -42,6 +45,29 @@ def delcontact(name):
             printerr(f'Something wrong with deleting {name}')
     except:
         printerr(f'error: {name}')
+
+
+def showcontacts2():
+    data = contacts.copy()
+    headers = {'name':"Имя",'phone':"Телефон"}
+
+    col_widths = [
+    max([len(val['name']) for k, val in enumerate(data+[headers])]),
+    max([len(str(val['phone'])) for k, val in enumerate(data+[headers])])
+    ]
+
+    separator = '+' + '+'.join('-' * (width + 2) for width in col_widths) + '+'
+
+    print(separator)
+    header_row = '|' + '|'.join(f' {h:{w}} ' for h, w in zip(list(headers.values()), col_widths)) + '|'
+    print(header_row)
+    print(separator)
+    for row in data:
+        # print (row)
+        data_row = '|' + '|'.join(f' {str(cell):{width}} ' for cell, width in zip(sorted(row.vqalues(),reverse=True), col_widths)) + '|' # с сортировкой бы разобраться 
+        print(data_row)
+    print(separator)
+
 
 def showcontacts(**kwargs):
     print(kwargs)
@@ -82,11 +108,11 @@ contacts = []
 
 menu = {
     '1': 'Добавить контакт',
-    '2': 'Показать все контакты',
-    '3': 'Найти контакт',
+    '2': 'Показать все контакты(странное самописное)',
+    '3': 'Найти контакт(pandas)',
     '4': 'Изменить контакт',
     '5': 'Удалить контакт',
-    '6': 'Выход',
+    '6': r'Выход(ctrl+c\esc)',
     '0': 'Почистить контакты'
 }
 
@@ -113,7 +139,7 @@ while True :
         contacts = db.dbget()
     elif cse == '2': # показать
         #print(contacts)
-        showcontacts()
+        showcontacts2()
         printinfo('Нажмите любую клавишу для продолжения')
     elif cse == '3': #
         name = input("Введите имя(фильтр): ")
