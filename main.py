@@ -52,18 +52,15 @@ def showcontacts(**kwargs):
         df = df[df['name'].str.contains(name, case=False)]
         if df.empty == False:
             print(df)
-        else:
             print('контактов не найдено')
 
 def modifycontact(**kwargs):
     name = kwargs.get('name', '')
     phone = kwargs.get('phone', '')
-    cursor.execute('''
-    UPDATE contacts SET phone = ? WHERE name = ?
-    ''', (phone, name))
-    dbcommit()
-    printinfo(f'Контакт "{name}: {phone}" изменен.')
-
+    if db.dbmodify(name=name, phone=phone) > 0:
+        printinfo(f'Контакт "{name}: {phone}" изменен.')
+    else:
+        printerr(f'error: {name}, {phone}')
 
 def getname():
     name = input("Введите имя: ")
@@ -118,14 +115,18 @@ while True :
         #print(contacts)
         showcontacts()
         printinfo('Нажмите любую клавишу для продолжения')
-    elif cse == '3': # 
+    elif cse == '3': #
         name = input("Введите имя(фильтр): ")
         #print(contacts)
         showcontacts(name = name)
         printinfo('Нажмите любую клавишу для продолжения')
     elif cse == '4': # изменить контакт
         name = getname()
+        if name == None:
+            continue
         tel = getphone()
+        if tel == None:
+            continue
         modifycontact(name=name, phone=tel)
         contacts = db.dbget()
     elif cse == '5': # удалить контакт
@@ -133,7 +134,7 @@ while True :
         delcontact(name)
         contacts = db.dbget()
     elif cse == '6':
-        dbclose()
+        db.dbclose()
         print('Программа завершает работу.')
         exit()
         printerr('Err: неправильная команда')

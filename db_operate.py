@@ -48,18 +48,30 @@ def dbdel(name):
 
 def dbadd(**kwargs):
     try:
-      name = kwargs.get('name', '')
-      phone = kwargs.get('phone', '')
-      cursor.execute('''
-      INSERT INTO contacts (name, phone) VALUES (?, ?)
-      ''', (name, phone))
-      dbcommit()
-      #printinfo(f'Контакт "{name}: {tel}" добавлен.')
-      return cursor.rowcount
+        name = kwargs.get('name', '')
+        phone = kwargs.get('phone', '')
+        cursor.execute('''
+        INSERT INTO contacts (name, phone) VALUES (?, ?)
+        ''', (name, phone))
+        dbcommit()
+        #printinfo(f'Контакт "{name}: {tel}" добавлен.')
+        return cursor.rowcount
     except Exception as e:
-      print(f'error: {e}')
-      return 0
+        print(f'error: {e}')
+        return 0
 
+def dbmodify(**kwargs):
+    try:
+        name = kwargs.get('name', '')
+        phone = kwargs.get('phone', '')
+        cursor.execute('''
+        UPDATE contacts SET phone = ? WHERE name = ?
+        ''', (phone, name))
+        dbcommit()
+        return cursor.rowcount
+    except Exception as e:
+        print(f'error: {e}')
+        return 0
 
 connection = sqlite3.connect('contacts.db')
 cursor = connection.cursor()
