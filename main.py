@@ -64,7 +64,7 @@ def showcontacts2():
     print(separator)
     for row in data:
         # print (row)
-        data_row = '|' + '|'.join(f' {str(cell):{width}} ' for cell, width in zip(sorted(row.vqalues(),reverse=True), col_widths)) + '|' # с сортировкой бы разобраться 
+        data_row = '|' + '|'.join(f' {str(cell):{width}} ' for cell, width in zip(sorted(row.values(),reverse=True), col_widths)) + '|' # с сортировкой бы разобраться 
         print(data_row)
     print(separator)
 
