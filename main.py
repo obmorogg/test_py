@@ -59,12 +59,12 @@ def showcontacts2():
     separator = '+' + '+'.join('-' * (width + 2) for width in col_widths) + '+'
 
     print(separator)
-    header_row = '|' + '|'.join(f' {h:{w}} ' for h, w in zip(list(headers.values()), col_widths)) + '|'
+    header_row = '|' + '|'.join(f' {h:{w}} ' for h, w in zip([headers['name'], headers['phone']], col_widths)) + '|'
     print(header_row)
     print(separator)
     for row in data:
         # print (row)
-        data_row = '|' + '|'.join(f' {str(cell):{width}} ' for cell, width in zip(sorted(row.values(),reverse=True), col_widths)) + '|' # с сортировкой бы разобраться 
+        data_row = '|' + '|'.join(f' {str(cell):{width}} ' for cell, width in zip([row['name'], row['phone']], col_widths)) + '|'
         print(data_row)
     print(separator)
 
