@@ -78,7 +78,8 @@ def showcontacts(**kwargs):
         df = df[df['name'].str.contains(name, case=False)]
         if df.empty == False:
             print(df)
-            print('контактов не найдено')
+            return
+        print('контактов не найдено')
 
 def modifycontact(**kwargs):
     name = kwargs.get('name', '')
