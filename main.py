@@ -2,14 +2,13 @@ import pandas as pd
 import re
 import os
 import db_operate as db
-#import visual as v
 import msvcrt as m
 
-def printerr(err):
+def printErr(err):
     print(f"\033[31m{err}\033[0m")
     m.getch()
 
-def printinfo(err):
+def printInfo(err):
     print(f"\033[1;32m{err}\033[0m")
     m.getch()
 
@@ -35,7 +34,7 @@ def getname():
     name = input("Введите имя: ")
     name = name.strip()
     if not re.match("^[A-Za-zА-Яа-я ]*$", name) or len(name) < 2:
-        printerr(r'Err: неправильное имя: должны быть только буквы\пробелы(не менее 2 символов)')
+        printErr(r'Err: неправильное имя: должны быть только буквы\пробелы(не менее 2 символов)')
         return
     return name
 
@@ -43,56 +42,10 @@ def getphone():
     tel = input("Введите номер: ")
     tel = tel.strip()
     if not re.match("^[0-9]*$", tel) or len(tel) < 2:
-        printerr(r'Err: неправильное имя должны быть только буквы\пробелы(не менее 2 символов)')
+        printErr(r'Err: неправильное имя должны быть только буквы\пробелы(не менее 2 символов)')
         return
     return tel
 
-'''
-
-# Проект: Телефонный справочник. Часть 3
-
-Перенесите действия справочника в методы:
-
-```python
-
-```
-
-Меню остаётся прежним:
-
-```text
-1. Добавить контакт
-2. Показать все контакты
-3. Найти контакт
-4. Изменить контакт
-5. Удалить контакт
-6. Выйти
-```
-
-### Пример
-
-```python
-phone_book = PhoneBook()
-
-phone_book.add_contact("Анна", "12345")
-phone_book.add_contact("Иван", "67890")
-
-phone_book.show_contacts()
-```
-
-### Результат
-
-```text
-Имя       | Телефон
------------+----------
-Анна      | 12345
-Иван      | 67890
-```
-
-Поиск контакта должен работать независимо от регистра.
-
----
-
-'''
 
 class contact:
     def __init__(self, name, phone):
@@ -110,9 +63,9 @@ class PhoneBook:
     def add_contact(self, name, phone):
         if db.dbadd(name=name, phone=phone) == 1:
             self.contacts.append(contact(name, phone))
-            printinfo(f'Контакт "{name}: {tel}" добавлен.')
+            printInfo(f'Контакт "{name}: {tel}" добавлен.')
         else:
-            printerr(f'error: {name}, {phone}')
+            printErr(f'error: {name}, {phone}')
 
 
     # def show_contacts(self):
@@ -126,13 +79,13 @@ class PhoneBook:
                 for contact in self.contacts:
                     if contact.name == name:
                         self.contacts.remove(contact)
-                printinfo(f'Контакт "{name}" удален в колтчестве {rez}')
+                printInfo(f'Контакт "{name}" удален в колтчестве {rez}')
             elif rez == 0:
-                printinfo(f'Контакт "{name}" не найден')
+                printInfo(f'Контакт "{name}" не найден')
             else:
-                printerr(f'Something wrong with deleting {name}')
+                printErr(f'Something wrong with deleting {name}')
         except:
-            printerr(f'error: {name}')
+            printErr(f'error: {name}')
 
 
     def show_contacts2(self, **kwargs):
@@ -185,22 +138,18 @@ class PhoneBook:
             for contact in self.contacts:
                 if contact.name == name:
                     contact.phone = phone
-            printinfo(f'Контакт "{name}: {phone}" изменен.')
+            printInfo(f'Контакт "{name}: {phone}" изменен.')
         else:
-            printerr(f'error: {name}, {phone}')
-
-
-
+            printErr(f'error: {name}, {phone}')
 
 ###################################################################################
-
 
 phone_book = PhoneBook()
 
 menu = {
     '1': 'Добавить контакт',
-    '2': 'Показать все контакты(странное самописное)',
-    '3': 'Найти контакт(pandas)',
+    '2': 'Показать все контакты',
+    '3': 'Найти контакт',
     '4': 'Изменить контакт',
     '5': 'Удалить контакт',
     '6': r'Выход(ctrl+c\esc)',
@@ -209,21 +158,19 @@ menu = {
 
 cls()
 db.dbinit()
-#phone_book.contacts = db.dbget()
 asd = db.dbget()
-print(asd)
 
 for k in asd:
      phone_book.contacts.append(contact(k["name"], k["phone"]))
 
-i = 0
 #print(phone_book.contacts)
-
-
 # data = [['Apple', 2, 150], ['Banana', 3, 120]]
 # df = pd.DataFrame(data, columns=['Fruit', 'Quantity', 'Price'])
 # showcontacts(name = '')
 #exit()
+
+
+i = 0
 while True :
     i += 1
     exit('<<<<<<<<<<<<< megaloop check exit >>>>>>>>>>>>') if i == 100 else None # megaloop exit
@@ -236,12 +183,12 @@ while True :
     elif cse == '2': # показать
         #print(contacts)
         phone_book.show_contacts2()
-        printinfo('Нажмите любую клавишу для продолжения')
+        printInfo('Нажмите любую клавишу для продолжения')
     elif cse == '3': #
         name = input("Введите имя(фильтр): ")
         #print(contacts)
         phone_book.show_contacts2(name = name)
-        printinfo('Нажмите любую клавишу для продолжения')
+        printInfo('Нажмите любую клавишу для продолжения')
     elif cse == '4': # изменить контакт
         name = getname()
         if name == None:
@@ -259,12 +206,9 @@ while True :
         db.dbclose()
         print('Программа завершает работу.')
         exit()
-        printerr('Err: неправильная команда')
+        printErr('Err: неправильная команда')
     elif cse == '0':
         db.dbclear()
         contacts = []
         cls()
-        printinfo('Контакты очищены')
-    # else:
-    #     print('неправильная команда')
-#"""
+        printInfo('Контакты очищены')

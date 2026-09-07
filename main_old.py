@@ -19,32 +19,32 @@ def getuserresp():
         exit()
     return str(int(cse)) if cse in (b'1', b'2', b'3', b'4', b'5', b'6', b'0') else '-1'
 
-def printerr(err):
+def printErr(err):
     print(f"\033[31m{err}\033[0m")
     m.getch()
 
-def printinfo(err):
+def printInfo(err):
     print(f"\033[1;32m{err}\033[0m")
     m.getch()
 
 def addcontact(name, phone):
     #rez = db.add(name=name, phone=phone)
     if db.dbadd(name=name, phone=phone) == 1:
-        printinfo(f'Контакт "{name}: {tel}" добавлен.')
+        printInfo(f'Контакт "{name}: {tel}" добавлен.')
     else:
-        printerr(f'error: {name}, {phone}')
+        printErr(f'error: {name}, {phone}')
 
 def delcontact(name):
     try:
         rez= db.dbdel(name=name)
         if rez > 0:
-            printinfo(f'Контакт "{name}" удален в колтчестве {rez}')
+            printInfo(f'Контакт "{name}" удален в колтчестве {rez}')
         elif rez == 0:
-            printinfo(f'Контакт "{name}" не найден')
+            printInfo(f'Контакт "{name}" не найден')
         else:
-            printerr(f'Something wrong with deleting {name}')
+            printErr(f'Something wrong with deleting {name}')
     except:
-        printerr(f'error: {name}')
+        printErr(f'error: {name}')
 
 
 def showcontacts2():
@@ -85,15 +85,15 @@ def modifycontact(**kwargs):
     name = kwargs.get('name', '')
     phone = kwargs.get('phone', '')
     if db.dbmodify(name=name, phone=phone) > 0:
-        printinfo(f'Контакт "{name}: {phone}" изменен.')
+        printInfo(f'Контакт "{name}: {phone}" изменен.')
     else:
-        printerr(f'error: {name}, {phone}')
+        printErr(f'error: {name}, {phone}')
 
 def getname():
     name = input("Введите имя: ")
     name = name.strip()
     if not re.match("^[A-Za-zА-Яа-я ]*$", name) or len(name) < 2:
-        printerr(r'Err: неправильное имя: должны быть только буквы\пробелы(не менее 2 символов)')
+        printErr(r'Err: неправильное имя: должны быть только буквы\пробелы(не менее 2 символов)')
         return
     return name
 
@@ -101,7 +101,7 @@ def getphone():
     tel = input("Введите номер: ")
     tel = tel.strip()
     if not re.match("^[0-9]*$", tel) or len(tel) < 2:
-        printerr(r'Err: неправильное имя должны быть только буквы\пробелы(не менее 2 символов)')
+        printErr(r'Err: неправильное имя должны быть только буквы\пробелы(не менее 2 символов)')
         return
     return tel
 ###################################################################################
@@ -141,12 +141,12 @@ while True :
     elif cse == '2': # показать
         #print(contacts)
         showcontacts2()
-        printinfo('Нажмите любую клавишу для продолжения')
+        printInfo('Нажмите любую клавишу для продолжения')
     elif cse == '3': #
         name = input("Введите имя(фильтр): ")
         #print(contacts)
         showcontacts(name = name)
-        printinfo('Нажмите любую клавишу для продолжения')
+        printInfo('Нажмите любую клавишу для продолжения')
     elif cse == '4': # изменить контакт
         name = getname()
         if name == None:
@@ -164,12 +164,12 @@ while True :
         db.dbclose()
         print('Программа завершает работу.')
         exit()
-        printerr('Err: неправильная команда')
+        printErr('Err: неправильная команда')
     elif cse == '0':
         db.dbclear()
         contacts = []
         cls()
-        printinfo('Контакты очищены')
+        printInfo('Контакты очищены')
     # else:
     #     print('неправильная команда')
 #"""

@@ -54,7 +54,7 @@ def dbadd(**kwargs):
         INSERT INTO contacts (name, phone) VALUES (?, ?)
         ''', (name, phone))
         dbcommit()
-        #printinfo(f'Контакт "{name}: {tel}" добавлен.')
+        #printInfo(f'Контакт "{name}: {tel}" добавлен.')
         return cursor.rowcount
     except Exception as e:
         print(f'error: {e}')

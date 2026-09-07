@@ -1170,6 +1170,7 @@ orders = [
 '''
 ##################################################################################
 
+
 class Order:
     def __init__(self, number, price):
         self.number = number
@@ -1185,6 +1186,10 @@ class Order:
         return self.__price
 
     def show_info(self):
+        for cl in Order.__subclasses__():
+            if isinstance(self, cl):
+                print(cl.__name__)
+
         print(f"Заказ №{self.number}")
         print(f"Итого: {self.__price}")
 
@@ -1193,18 +1198,24 @@ class PickupOrder(Order):
         super().__init__(number, price)
     def get_total(self):
         return self.get_price()
+    def __str__(self):
+        return f"PickupOrder({self.number})"
 
 class CourierOrder(Order):
     def __init__(self, number, price):
         super().__init__(number, price)
     def get_total(self):
         return self.get_price() + 500
+    def __str__(self):
+        return f"CourierOrder({self.number})"
 
 class ExpressOrder(Order):
     def __init__(self, number, price):
         super().__init__(number, price)
     def get_total(self):
         return self.get_price() + 1000
+    def __str__(self):
+        return f"ExpressOrder({self.number})"
 
 orders = [
     PickupOrder(101, 5000),
@@ -1213,14 +1224,16 @@ orders = [
     CourierOrder(104, 7000)
 ]
 
+
+
 total = 0
 for order in orders:
     order.show_info()
+    #print(order)
     print(f"Итого: {order.get_total()}")
     total += order.get_total()
 
 print(f"Общая сумма: {total}")
-
 
 
 '''
