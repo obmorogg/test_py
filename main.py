@@ -1,4 +1,13 @@
-import pandas as pd
+
+'''
+
+
+'''
+
+
+
+
+#import pandas as pd
 import re
 import os
 import db_operate as db
@@ -17,17 +26,19 @@ def printInfo(err):
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def getuserresp():
+def GetUserResp():
     cls()
     print('<<<------------ start <<<------------', flush=True)
-    for key, value in menu.items():
-        print(f'{key}. {value}')
+
+    # цикл по сортированным ключам items
+    for key in sorted(menu):
+        print(f'{int(key)}. {menu[key]}')
     print("Выберите действие: ")
     cse = m.getch()
     #print(cse)
     if cse in [b'\x03', b'\x1b']:
         exit()
-    return str(int(cse)) if cse in (b'1', b'2', b'3', b'4', b'5', b'6', b'0') else '-1'
+    return str(int(cse)) if cse in (menu.keys()) else '-1'
 
 
 def getname():
@@ -47,20 +58,40 @@ def getphone():
     return tel
 
 
-class contact:
+class Contact:
     def __init__(self, name, phone):
         self.name = name
         self.phone = phone
 
+    def __str__(self):
+        return f'{self.name} | {self.phone}'
+
     def show_info(self):
         print(f'Имя: {self.name}\nТелефон: {self.phone}')
+
+class PersonalContact(Contact):
+    def __init__(self, name, phone, relation):
+        super().__init__(name, phone)
+        self.realtion = relation
+    def __str__(self):
+        return f'{self.name} | {self.phone} | {self.realtion}'
+
+class WorkContact(Contact):
+    def __init__(self, name, phone, company):
+        super().__init__(name, phone)
+        self.company = company
+    def __str__(self):
+        return f'{self.name} | {self.phone} | {self.company}'
 
 
 class PhoneBook:
     def __init__(self):
         self.contacts = []
 
-    def add_contact(self, name, phone):
+    def add_contact(self, object):
+        self.contacts.append(object)
+
+    def add_contact1(self, name, phone):
         if db.dbadd(name=name, phone=phone) == 1:
             self.contacts.append(contact(name, phone))
             printInfo(f'Контакт "{name}: {tel}" добавлен.')
@@ -142,39 +173,62 @@ class PhoneBook:
         else:
             printErr(f'error: {name}, {phone}')
 
+    def __len__(self):
+        return len(self.contacts)
+
+    def __str__(self):
+        #self.show_contacts2()
+        for contact in self.contacts:
+            print(contact)
+        return ''
+
 ###################################################################################
 
 phone_book = PhoneBook()
-
+#b'1', b'2', b'3', b'4', b'5', b'6', b'0'
 menu = {
-    '1': 'Добавить контакт',
-    '2': 'Показать все контакты',
-    '3': 'Найти контакт',
-    '4': 'Изменить контакт',
-    '5': 'Удалить контакт',
-    '6': r'Выход(ctrl+c\esc)',
-    '0': 'Почистить контакты'
+    b'1': 'Добавить контакт',
+    b'2': 'Показать все контакты',
+    b'3': 'Найти контакт',
+    b'4': 'Изменить контакт',
+    b'5': 'Удалить контакт',
+    b'7': 'Количество контактов',
+    b'6': r'Выход(ctrl+c\esc)',
+    b'0': 'Почистить контакты'
 }
 
 cls()
+
+phone_book1 = PhoneBook()
+phone_book1.add_contact(PersonalContact("Анна", "12345", "друг"))
+phone_book1.add_contact(WorkContact("Иван", "67890", "SkyPro"))
+print(phone_book1)
+print("Всего контактов:", len(phone_book1))
+exit()
+
+
+########################################################################################################################
+# до лучших времен
+########################################################################################################################
+
 db.dbinit()
 asd = db.dbget()
 
 for k in asd:
-     phone_book.contacts.append(contact(k["name"], k["phone"]))
+     phone_book.contacts.append(Contact(k["name"], k["phone"]))
 
 #print(phone_book.contacts)
 # data = [['Apple', 2, 150], ['Banana', 3, 120]]
 # df = pd.DataFrame(data, columns=['Fruit', 'Quantity', 'Price'])
 # showcontacts(name = '')
-#exit()
+
 
 
 i = 0
 while True :
     i += 1
     exit('<<<<<<<<<<<<< megaloop check exit >>>>>>>>>>>>') if i == 100 else None # megaloop exit
-    cse = getuserresp()
+    cse = GetUserResp()
     if cse == '1': # добавить
         name = getname()
         tel = getphone()
@@ -182,7 +236,7 @@ while True :
         contacts = db.dbget()
     elif cse == '2': # показать
         #print(contacts)
-        phone_book.show_contacts2()
+        print(phone_book)
         printInfo('Нажмите любую клавишу для продолжения')
     elif cse == '3': #
         name = input("Введите имя(фильтр): ")
@@ -207,6 +261,10 @@ while True :
         print('Программа завершает работу.')
         exit()
         printErr('Err: неправильная команда')
+    elif cse == '7':
+        cls()
+        print(f'Количество контактов: {len(phone_book)}')
+        printInfo('Нажмите любую клавишу для продолжения')
     elif cse == '0':
         db.dbclear()
         contacts = []
