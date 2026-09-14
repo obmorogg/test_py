@@ -17,4 +17,7 @@ def calculate_total(price, quantity, discount=0):
     итого = 2700
     ```
     """
+    print(f'{price} * {quantity} = {price * quantity}')
+    print(f'Скидка {price * quantity * discount / 100} ')
+    print(f'Итого {price * quantity - price * quantity * discount / 100}')
     pass

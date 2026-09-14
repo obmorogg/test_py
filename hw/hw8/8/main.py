@@ -117,4 +117,29 @@ from order_system import calculate_total, OrderError
 
 """
 
+
+
+############# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! не доделано, в отпуске , не всегда успеваю
+
+
+
 from order_system import calculate_total, OrderError
+
+price = '10'
+quantity = '10'
+discount = '10'
+
+while True:
+    try:
+        print('Введите цену')
+        price = input()
+        print('Введите количество')
+        quantity = input()
+        print('Введите скидку')
+        discount = input()
+        break
+    except OrderError(error):
+        print(error)
+    
+
+calculate_total(int(price),int(quantity),int(discount))
