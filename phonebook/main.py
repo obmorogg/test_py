@@ -109,8 +109,10 @@ if __name__ == "__main__":
     phone_book.add_contact(PersonalContact("Анна", "12345", "друг"))
     # phone_book1.add_contact(PersonalContact("Анна", "12345", "друг"))
     phone_book.add_contact(WorkContact("Иван", "67890", "SkyPro"))
+    phone_book.update_contact(name="Анна", phone="99999", relation="друг1")
+    # printInfo('Нажмите любую клавишу для продолжения')
     # phone_book1.delete_contact("Анна1")
-    # print(phone_book1)
+    # print(phone_book)
     # print("Всего контактов:", len(phone_book1))
     # exit()
 
@@ -153,15 +155,15 @@ if __name__ == "__main__":
             # printInfo('Нажмите любую клавишу для продолжения')
         elif cse == '3': # Показать все контакты
             cls()
-            print(phone_book)
+            print(phone_book.show_contacts(name = ''))
             # name = input("Введите имя(фильтр): ")
             # #print(contacts)
             # phone_book.show_contacts2(name = name)
             printInfo('Нажмите любую клавишу для продолжения')
         elif cse == '4': # Найти контакт
             name = getName()
-            print(phone_book.find_contact(name))
-            # printInfo('Нажмите любую клавишу для продолжения')
+            print(phone_book.find_contact(name=name))
+            printInfo('Нажмите любую клавишу для продолжения')
             # #print(contacts)
             # name = getname()
             # if name == None:
@@ -171,15 +173,38 @@ if __name__ == "__main__":
             #     continue
             # phone_book.modify_contact(name=name, phone=tel)
             # contacts = db.dbget()
-        elif cse == '5': # удалить контакт
-            name = getname()
+        elif cse == '5': # Изменить контакт
+            name = getName()
+            if name == None:
+                continue
+            upd = phone_book.find_contact(name=name)
+
+            if upd != None:
+                print(upd)
+                phone = getPhone()
+
+                if upd.__class__.__name__ == 'PersonalContact':
+                    print('>>Личный контакт')
+                    rel = getRelation()
+                    phone_book.update_contact(name=name, phone=phone, relation=rel)
+                elif upd.__class__.__name__ == 'WorkContact':
+                    print('>>Рабочий контакт')
+                    comp = getCompany()
+                    phone_book.update_contact(name=name, phone=phone, company=comp)
+            else:
+                printErr('Контакт не найден')
+            printInfo('Нажмите любую клавишу для продолжения')
+
+            # tel = getPhone()
+            # if tel == None:
+            #     continue
+            # rel = getRelation()
+            # phone_book.modify_contact(name=name, phone=tel, relation=rel)
+            # contacts = db.dbget()
+        elif cse == '6': # Удалить контакт
+            name = getТame()
             phone_book.del_contact(name)
             contacts = db.dbget()
-        elif cse == '6':
-            db.dbclose()
-            print('Программа завершает работу.')
-            exit()
-            printErr('Err: неправильная команда')
         elif cse == '7':
             cls()
             print(f'Количество контактов: {len(phone_book)}')

@@ -63,17 +63,6 @@ class PhoneBook:
         except e.DuplicateContactError as err:
             h.printErr(f'{err}')
 
-        # if rez == 1:
-        #     self.contacts.append(object)
-        #     h.printInfo(f'Контакт "{object}" добавлен.')
-        # else:
-        #     h.printErr(f'error: {object}')
-
-
-    # def show_contacts(self):
-    #     for contact in self.contacts:
-    #         contact.show_info()
-
     def delete_contact(self,name):
         try:
             rez = 0
@@ -94,28 +83,30 @@ class PhoneBook:
             if contact.name == kwargs.get('name', ''):
                 return contact
 
-    def print_contact(self, **kwargs):
-        cls()
+    def show_contacts(self, **kwargs):
         data = []#contacts.copy()
         name = kwargs.get('name', '')
         for contact in self.contacts:
-            data.append({'name': contact.name, 'phone': contact.phone})
-        headers = {'name':"Имя",'phone':"Телефон"}
+            data.append({'name': contact.name, 'phone': contact.phone, 'info': contact.additional_info()})
+            #print({'name': contact.name, 'phone': contact.phone, 'info': contact.additional_info()})
+        print(data)
+        headers = {'name':"Имя",'phone':"Телефон",'info':"Дополнительно"}
 
         col_widths = [
-        max([len(val['name']) for k, val in enumerate(data+[headers])]),
-        max([len(str(val['phone'])) for k, val in enumerate(data+[headers])])
+            max([len(val['name']) for k, val in enumerate(data+[headers])]),
+            max([len(str(val['phone'])) for k, val in enumerate(data+[headers])]),
+            max([len(str(val['info'])) for k, val in enumerate(data+[headers])])
         ]
 
         separator = '+' + '+'.join('-' * (width + 2) for width in col_widths) + '+'
 
         print(separator)
-        header_row = '|' + '|'.join(f' {h:{w}} ' for h, w in zip([headers['name'], headers['phone']], col_widths)) + '|'
+        header_row = '|' + '|'.join(f' {h:{w}} ' for h, w in zip([headers['name'], headers['phone'], headers['info']], col_widths)) + '|'
         print(header_row)
         print(separator)
         for row in data:
-            # print (row)
-            data_row = '|' + '|'.join(f' {str(cell):{width}} ' for cell, width in zip([row['name'], row['phone']], col_widths)) + '|'
+            #print (row)
+            data_row = '|' + '|'.join(f' {str(cell):{width}} ' for cell, width in zip([row['name'], row['phone'], row['info']], col_widths)) + '|'
             if row['name'].lower().find(name.lower()) == -1:
                 continue
             print(data_row)
@@ -123,14 +114,18 @@ class PhoneBook:
 
     def update_contact(self,**kwargs):
         name = kwargs.get('name', '')
-        phone = kwargs.get('phone', '')
-        if db.dbmodify(name=name, phone=phone) > 0:
-            for contact in self.contacts:
-                if contact.name == name:
-                    contact.phone = phone
-            printInfo(f'Контакт "{name}: {phone}" изменен.')
-        else:
-            printErr(f'error: {name}, {phone}')
+        # phone = kwargs.get('phone', '')
+        upd = self.find_contact(name=name)
+        if upd != None:
+            upd.update_contact(**kwargs)
+
+        # if db.dbmodify(name=name, phone=phone) > 0:
+        #     for contact in self.contacts:
+        #         if contact.name == name:
+        #             contact.phone = phone
+        #     printInfo(f'Контакт "{name}: {phone}" изменен.')
+        # else:
+        #     printErr(f'error: {name}, {phone}')
 
     def __len__(self):
         return len(self.contacts)
