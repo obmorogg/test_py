@@ -1,58 +1,34 @@
 """
+## 3. Случайный контакт
 
-## `service.py`
-
-Перенесите сюда класс:
-
-```python
-PhoneBook
-```
-
-Сохраните методы:
+Добавьте в `PhoneBook` метод:
 
 ```python
-add_contact()
-find_contact()
-update_contact()
-delete_contact()
+random_contact()
 ```
 
-### `add_contact()`
+Метод должен возвращать случайный контакт с помощью `random.choice()`.
 
-Если контакт с таким именем уже существует:
+Если справочник пуст, вызывайте:
 
 ```python
-raise DuplicateContactError(...)
+ContactNotFoundError
 ```
-
-### `find_contact()`
-
-Если контакт не найден:
-
-```python
-raise ContactNotFoundError(...)
-```
-
-### `update_contact()` и `delete_contact()`
-
-Если контакта нет, должно возникать `ContactNotFoundError`.
-
----
 """
 
 import phonebook.db as db
 import phonebook.helpers as h
 import phonebook.exceptions as e
+import random
 
 class PhoneBook:
     def __init__(self):
         self.contacts = []
-    """
-    find_contact()
 
-    """
-    # def add_contact(self, object):
-    #     self.contacts.append(object)
+    def random_contact(self):
+        if len(self.contacts) == 0:
+            raise e.ContactNotFoundError('')
+        return random.choice(self.contacts)
 
     def add_contact(self, object):
         try:

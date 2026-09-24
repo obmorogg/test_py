@@ -32,9 +32,6 @@ def getUserResp(menu):
 def getName():
     name = input("Введите имя: ")
     name = name.strip()
-    if not re.match("^[A-Za-zА-Яа-я ]*$", name) or len(name) < 2:
-        printErr(r'Err: неправильное имя: должны быть только буквы\пробелы(не менее 2 символов)')
-        return
     return name
 
 def getCompany():
@@ -48,15 +45,9 @@ def getCompany():
 def getRelation():
     name = input("Введите статус  отношений: ")
     name = name.strip()
-    if not re.match("^[A-Za-zА-Яа-я ]*$", name) or len(name) < 2:
-        printErr(r'Err: неправильное имя: должны быть только буквы\пробелы(не менее 2 символов)')
-        return
     return name
 
 def getPhone():
     tel = input("Введите номер: ")
     tel = tel.strip()
-    if not re.match("^[0-9]*$", tel) or len(tel) < 2:
-        printErr(r'Err: неправильное имя должны быть только буквы\пробелы(не менее 2 символов)')
-        return
     return tel

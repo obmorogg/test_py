@@ -65,6 +65,7 @@ from phonebook import (
     PhoneBook,
     PersonalContact,
     WorkContact,
+    Contact,
     cls,
     printInfo,
     printErr,
@@ -99,22 +100,27 @@ if __name__ == "__main__":
         b'4': 'Найти контакт',
         b'5': 'Изменить контакт',
         b'6': 'Удалить контакт',
-        b'7': r'Выход(ctrl+c\esc)'
+        b'7': 'Случайный контакт',
+        b'8': r'Выход(ctrl+c\esc)'
         # b'0': 'Почистить контакты'
     }
 
     cls()
 
     phone_book = PhoneBook()
-    phone_book.add_contact(PersonalContact("Анна", "12345", "друг"))
+    phone_book.add_contact(PersonalContact("Анна", "+71234567890", "друг"))
+    phone_book.add_contact(Contact("Анна1", "+7123456789s0"))
+    exit()
     # phone_book1.add_contact(PersonalContact("Анна", "12345", "друг"))
-    phone_book.add_contact(WorkContact("Иван", "67890", "SkyPro"))
-    phone_book.update_contact(name="Анна", phone="99999", relation="друг1")
-    # printInfo('Нажмите любую клавишу для продолжения')
+    phone_book.add_contact(WorkContact("Иван1", "+71234567891", "SkyPro"))
+    phone_book.add_contact(WorkContact("Иван2", "+7123456733892", "SkyPro"))
+    phone_book.add_contact(WorkContact("Иван3", "81234567893", "SkyPro"))
+    phone_book.update_contact(name="Анна", phone="81234567894", relation="друг1")
+    #printInfo('Нажмите любую клавишу для продолжения')
     # phone_book1.delete_contact("Анна1")
-    # print(phone_book)
+    print(phone_book)
     # print("Всего контактов:", len(phone_book1))
-    # exit()
+    exit()
 
 
     ########################################################################################################################
@@ -205,7 +211,10 @@ if __name__ == "__main__":
             name = getТame()
             phone_book.del_contact(name)
             contacts = db.dbget()
-        elif cse == '7':
+        elif cse == '7': # Случайный контакт
+            print(phone_book.random_contact())
+            printInfo('Нажмите любую клавишу для продолжения')
+        elif cse == '8':
             cls()
             print(f'Количество контактов: {len(phone_book)}')
             printInfo('Нажмите любую клавишу для продолжения')

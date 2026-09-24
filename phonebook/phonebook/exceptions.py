@@ -1,19 +1,3 @@
-"""
-## `exceptions.py`
-
-Создайте:
-
-```python
-PhoneBookError
-ContactNotFoundError
-DuplicateContactError
-```
-
-`PhoneBookError` наследуется от `Exception`.
-
-Остальные исключения наследуются от `PhoneBookError`.
-
-"""
 
 class PhoneBookError(Exception):
     pass
@@ -29,4 +13,30 @@ class DuplicateContactError(PhoneBookError):
         self.value = value
     def __str__(self):
         return f"Контакт {self.value} уже существует"
+
+class InvalidPhoneError(PhoneBookError):
+    def __init__(self, value):
+        self.value = value
+        print('asd')
+    def __str__(self):
+        return f"Номер {self.value} некорректен"
+
+class InvalidNameError(PhoneBookError):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return f"Имя {self.value} некорректно"
+
+class InvalidCompanyError(PhoneBookError):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return f"Компания {self.value} некорректна"
+
+class InvalidRelationError(PhoneBookError):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return f"Отношение {self.value} некорректно"
+
 
