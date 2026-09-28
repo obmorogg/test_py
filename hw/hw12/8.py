@@ -74,14 +74,6 @@ print(data1[0].max(axis=0))
 
 print('Изменённая копия')
 
-print(data1[1][:2])
-"""
-Второй склад:
-[[13 14 15 16]
- [17 18 19 20]
- [21 22 23 24]]
-"""
-data2 = data1[1, :2, :2].copy()
-print(data2)
-
+data2 = data1[1][:, 1:3].copy()
 data2 *= 10
+print(data2)
