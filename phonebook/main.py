@@ -1,61 +1,9 @@
 
-'''
-
-# Проект: Телефонный справочник. Часть 5
-
-
----
-
-## `main.py`
-
-Меню:
-
-```text
-1. Добавить личный контакт
-2. Добавить рабочий контакт
-3. Показать все контакты
-4. Найти контакт
-5. Изменить контакт
-6. Удалить контакт
-7. Выйти
-```
-
-Ошибки справочника обрабатывайте через:
-
-```python
-try:
-    ...
-except PhoneBookError as error:
-    print(error)
-```
-
-### Пример
-
-```text
-Введите имя: Анна
-Введите телефон: 12345
-Контакт добавлен
-
-Введите имя: Анна
-Введите телефон: 99999
-Контакт с именем Анна уже существует
-```
-
-При поиске отсутствующего контакта:
-
-```text
-Контакт Иван не найден
-```
-
----
-'''
-
-
 
 
 #import pandas as pd
 # import re
-# import os
+import json
 # import db_operate as db
 # import phonebook.helpers as h
 # import phonebook.contacts as c
@@ -77,6 +25,41 @@ from phonebook import (
 )
 
 
+
+def load(obj):
+    """
+    Он должен загружать данные из:
+
+    ```text
+    data/contacts.json
+    ```
+
+    Если файла ещё нет, справочник остаётся пустым.
+
+    Если JSON повреждён, обработайте:
+
+    ```python
+    json.JSONDecodeError
+    ```
+
+    и выведите:
+
+    ```text
+    Не удалось загрузить контакты
+    ```"""
+    try:
+        with open('./data/contacts.json', 'r', encoding="utf-8") as file:
+            data = json.load(file)
+    except json.JSONDecodeError:
+        print("Не удалось загрузить контакты")
+        return
+    obj.contacts = []
+    for asd in data:
+        contact = json.loads(asd)
+        if contact.get('relation') != None:
+            obj.contacts.append(PersonalContact(name=contact.get('name'), phone=contact.get('phone'), relation=contact.get('relation')))
+        elif contact.get('company') != None:
+            obj.contacts.append(WorkContact(name=contact.get('name'), phone=contact.get('phone'), company=contact.get('company')))
 
 ###################################################################################
 
@@ -105,23 +88,33 @@ if __name__ == "__main__":
         # b'0': 'Почистить контакты'
     }
 
-    cls()
+
+    # exit()
+
+
 
     phone_book = PhoneBook()
-    phone_book.add_contact(PersonalContact("Анна", "+71234567890", "друг"))
-    phone_book.add_contact(Contact("Анна1", "+7123456789s0"))
-    exit()
-    # phone_book1.add_contact(PersonalContact("Анна", "12345", "друг"))
-    phone_book.add_contact(WorkContact("Иван1", "+71234567891", "SkyPro"))
-    phone_book.add_contact(WorkContact("Иван2", "+7123456733892", "SkyPro"))
-    phone_book.add_contact(WorkContact("Иван3", "81234567893", "SkyPro"))
-    phone_book.update_contact(name="Анна", phone="81234567894", relation="друг1")
-    #printInfo('Нажмите любую клавишу для продолжения')
+    load(phone_book)
+    # phone_book.add_contact(PersonalContact("Анна", "+71234567890", "друг"))
+    # # exit()
+    # #phone_book.add_contact(Contact("Анна", "+71234567890"))
+    # # phone_book1.add_contact(PersonalContact("Анна", "12345", "друг"))
+    # phone_book.add_contact(WorkContact("Иванa", "+71234567891", "SkyPro"))
+    # phone_book.add_contact(WorkContact("Иванs", "+71234567392", "SkyPro"))
+    # phone_book.add_contact(WorkContact("Иванd", "81234567893", "SkyPro"))
+    # phone_book.update_contact(name="Анна", phone="81234567894", relation="sdfs")
+    # print(phone_book.find_contact(name = "Анна").to_json())
+    # asd = WorkContact("Иванa", "+71234567891", "SkyPro")
+    # print(asd.to_json())
+    # print(phone_book)
+    # exit()
+    """
+    printInfo('Нажмите любую клавишу для продолжения')
     # phone_book1.delete_contact("Анна1")
     print(phone_book)
     # print("Всего контактов:", len(phone_book1))
     exit()
-
+    """
 
     ########################################################################################################################
     # до лучших времен

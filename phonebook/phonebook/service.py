@@ -20,10 +20,35 @@ import phonebook.db as db
 import phonebook.helpers as h
 import phonebook.exceptions as e
 import random
+import json
+import pathlib as p
+
+
+
 
 class PhoneBook:
     def __init__(self):
+        path = p.Path("./data/")
+        path.mkdir(parents=True, exist_ok=True)
         self.contacts = []
+        #! создать папку для хранения контактов в data/contacts.json
+
+    def save(self):
+        """должен сохранять контакты в JSON.
+        * тип контакта;
+        * имя;
+        * телефон;
+        * дату создания;
+        * `relation` для личного контакта;
+        * `company` для рабочего контакта.
+        """
+        asd = []
+        for contact in self.contacts:
+            asd.append(contact.to_json())
+        with open('./data/contacts.json', 'w', encoding="utf-8") as file:
+            json.dump(asd, file, ensure_ascii=False, indent=4)
+
+        pass
 
     def random_contact(self):
         if len(self.contacts) == 0:
@@ -36,6 +61,7 @@ class PhoneBook:
             if self.find_contact(name=object.name):
                 raise e.DuplicateContactError(object.name)
             self.contacts.append(object)
+            self.save()
         except e.DuplicateContactError as err:
             h.printErr(f'{err}')
 
@@ -45,6 +71,7 @@ class PhoneBook:
             for contact in self.contacts:
                 if contact.name == name:
                     self.contacts.remove(contact)
+                    self.save()
                     rez = 1
                     break
             if rez == 1:
@@ -94,7 +121,7 @@ class PhoneBook:
         upd = self.find_contact(name=name)
         if upd != None:
             upd.update_contact(**kwargs)
-
+        self.save()
         # if db.dbmodify(name=name, phone=phone) > 0:
         #     for contact in self.contacts:
         #         if contact.name == name:
