@@ -129,6 +129,12 @@ class PhoneBook:
         #     printInfo(f'Контакт "{name}: {phone}" изменен.')
         # else:
         #     printErr(f'error: {name}, {phone}')
+    
+    def get_tab(self):
+        data = []
+        for contact in self.contacts:
+            data.append([contact.name, contact.phone, contact.additional_info()])
+        return data
 
     def __len__(self):
         return len(self.contacts)

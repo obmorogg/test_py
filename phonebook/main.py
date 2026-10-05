@@ -1,13 +1,92 @@
+"""
+
+# Проект: Телефонный справочник. Часть 9
+
+Продолжите работу с телефонным справочником.
+
+Основную функциональность приложения менять не нужно.
+
+Добавьте статистику с использованием NumPy.
+
+Если проект работает через Poetry, NumPy должен быть добавлен как основная зависимость проекта.
+
+## Метод statistics()
+
+Добавьте в `PhoneBook` метод:
+
+```python
+statistics()
+```
+
+Исходные данные справочника хранятся в виде объектов Python, поэтому **разрешается один раз преобразовать данные контактов в NumPy-массивы**.
+
+После этого все статистические вычисления должны выполняться средствами NumPy.
+
+Создайте массив длин имён контактов.
+
+На его основе определите:
+
+* количество контактов;
+* минимальную длину имени;
+* максимальную длину имени;
+* общее количество символов;
+* среднюю длину имени.
+
+Также создайте NumPy-массивы для определения количества:
+
+* личных контактов;
+* рабочих контактов.
+
+После формирования массивов не используйте обычные Python-функции:
+
+```python
+sum()
+min()
+max()
+```
+
+для статистических вычислений.
+
+### Пример
+
+В справочнике находятся:
+
+```text
+Анна
+Александр
+Мария
+Константин
+```
+
+Анна и Мария — личные контакты.
+
+Александр и Константин — рабочие.
+
+### Результат
+
+```text
+Всего контактов: 4
+Личных: 2
+Рабочих: 2
+
+Минимальная длина имени: 4
+Максимальная длина имени: 10
+Всего символов: 28
+Средняя длина имени: 7.0
+```
+
+Добавьте пункт:
+
+```text
+9. Статистика
+```
 
 
+"""
 
-#import pandas as pd
-# import re
 import json
-# import db_operate as db
-# import phonebook.helpers as h
-# import phonebook.contacts as c
-# import phonebook.service as s
+import tabulate as tab
+import numpy as np
 
 from phonebook import (
     PhoneBook,
@@ -61,6 +140,14 @@ def load(obj):
         elif contact.get('company') != None:
             obj.contacts.append(WorkContact(name=contact.get('name'), phone=contact.get('phone'), company=contact.get('company')))
 
+def statistics():
+    headers = ["Имя", "Телефон",'relation','company']
+    data = []
+    for contact in phone_book.contacts:
+        data.append([contact.name, contact.phone, contact.additional_info() if isinstance(contact, PersonalContact) else None, contact.additional_info() if isinstance(contact, WorkContact) else None])
+    print(tab.tabulate(data, headers=headers))
+
+
 ###################################################################################
 
 if __name__ == "__main__":
@@ -95,6 +182,23 @@ if __name__ == "__main__":
 
     phone_book = PhoneBook()
     load(phone_book)
+
+    # data = [
+    #     ["Alice", 30, "Engineer"],
+    #     ["Bob", 25, "Designer"],
+    #     ["Charlie", 35, "Manager"]
+    # ]
+
+    headers = ["Имя", "Телефон",'Дополнительно']
+
+    # print(tab.tabulate(data, headers=headers))
+
+
+
+    # print(phone_book.get_tab())
+    # print(tab.tabulate(phone_book.get_tab(), headers=headers))
+    # exit()
+
     # phone_book.add_contact(PersonalContact("Анна", "+71234567890", "друг"))
     # # exit()
     # #phone_book.add_contact(Contact("Анна", "+71234567890"))
@@ -154,7 +258,9 @@ if __name__ == "__main__":
             # printInfo('Нажмите любую клавишу для продолжения')
         elif cse == '3': # Показать все контакты
             cls()
-            print(phone_book.show_contacts(name = ''))
+            # print(phone_book.show_contacts(name = ''))
+            # print(tab.tabulate(phone_book.show_contacts2(name = ''), headers='keys', tablefmt='psql'))
+            print(tab.tabulate(phone_book.get_tab(), headers=headers))
             # name = input("Введите имя(фильтр): ")
             # #print(contacts)
             # phone_book.show_contacts2(name = name)
