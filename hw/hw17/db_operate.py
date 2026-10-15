@@ -39,7 +39,6 @@ def dbget():
 
 def dbdel(id):
     try:
-
         cursor.execute('''
         DELETE FROM items WHERE id = ?
         ''', (id,))
@@ -52,24 +51,41 @@ def dbdel(id):
         return -1
 
 def dbadd(**kwargs):
-    try:
-      name = kwargs.get('name', '')
-      category = kwargs.get('category', '')
-      price = kwargs.get('price', '')
-      currency = kwargs.get('currency', '')
-      count = kwargs.get('count', '')
-      cursor.execute('''
-      INSERT INTO items (name, category, price, currency, count) VALUES (?, ?, ?, ?, ?) RETURNING id
-      ''', (name, category, price, currency, count))
-      id = cursor.fetchone()[0]
-      dbcommit()
-      print(f'%%%%%%%%%%%% добавлено %%%%%%%%%%%%%%%%%% id={id}')
-      #printInfo(f'Контакт "{name}: {tel}" добавлен.')
-      return id
-    except Exception as e:
-      print(f'error: {e}')
-      return -1
+    # try:
+    name = kwargs.get('name', '')
+    category = kwargs.get('category', '')
+    price = kwargs.get('price', '')
+    currency = kwargs.get('currency', '')
+    count = kwargs.get('count', '')
+    cursor.execute('''
+    INSERT INTO items (name, category, price, currency, count) VALUES (?, ?, ?, ?, ?) RETURNING id
+    ''', (name, category, price, currency, count))
+    id = cursor.fetchone()[0]
+    dbcommit()
+    print(f'%%%%%%%%%%%% добавлено %%%%%%%%%%%%%%%%%% id={id}')
+    #printInfo(f'Контакт "{name}: {tel}" добавлен.')
+    return id
+    # except Exception as e:
+    #   print(f'error: {e}')
+    #   return -1
 
+
+def dbupdate(**kwargs):
+    try:
+        id = kwargs.get('item_id', '')
+        name = kwargs.get('name', '')
+        category = kwargs.get('category', '')
+        price = kwargs.get('price', '')
+        currency = kwargs.get('currency', '')
+        count = kwargs.get('count', '')
+        cursor.execute('''
+        UPDATE items SET name = ?, category = ?, price = ?, currency = ?, count = ? WHERE id = ?
+        ''', (name, category, price, currency, count, id))
+        dbcommit()
+        return cursor.rowcount
+    except Exception as e:
+        print(f'error: {e}')
+        return 0
 
 connection = sqlite3.connect('items.db')
 cursor = connection.cursor()

@@ -1,51 +1,14 @@
 """
 # Домашнее задание. Первый API-сервис на FastAPI
 
-## Проект: API склада товаров
-
-Создайте FastAPI-приложение для управления небольшим складом.
-
-Для каждого товара должны храниться:
-
-- название;
-- категория;
-- цена в рублях;
-- количество на складе.
-
-Самостоятельно создайте начальные данные: список минимум из **5 объектов товаров** не менее чем из **3 разных категорий**.
-
 ⭐ Задание 2 — **необязательное**.
 
 ---
 
 # Задание 1. API управления складом
 
-Реализуйте полный CRUD для товаров.
 
-API должно позволять:
 
-- получить список товаров;
-- получить один товар;
-- добавить новый товар;
-- полностью изменить существующий товар;
-- удалить товар.
-
-Для списка товаров добавьте необязательную фильтрацию:
-
-- по категории;
-- по максимальной цене;
-- по наличию на складе.
-
-Фильтры должны передаваться через query-параметры и работать как отдельно, так и одновременно.
-
-Номер конкретного товара передавайте через path-параметр.
-
-Для фильтра наличия:
-
-```text
-available=true  - только товары, количество которых больше 0
-available=false - только товары с нулевым остатком
-```
 
 ### Требования
 
@@ -103,7 +66,8 @@ rate
 
 ## Цена одного товара в выбранной валюте
 
-Получите товар по его номеру и пересчитайте его цену из рублей в выбранную валюту.
+Получите товар по его номеру и пересчитайте его цену из рублей в выбранную
+валюту.
 
 Валюта передаётся обязательным query-параметром:
 
@@ -184,58 +148,92 @@ EUR
 """
 
 
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.params import Query
 from fastapi.exceptions import HTTPException
-import pandas as pd
+# import pandas as pd
 import warehause as wh
 import db_operate as db
 
-#wh = pd.read_csv('warehouse.csv', sep=';')
+import requests
+
+# https://api.frankfurter.dev/v2/currencies
+
+currencies = requests.get('https://api.frankfurter.dev/v2/currencies').json()
+# print(currencies)
+# for currency in currencies:
+#     print(currency['iso_code'])
+
+
+#exit()
+
+
+# wh = pd.read_csv('warehouse.csv', sep=';')
+
+
+
 
 
 db.dbinit()
 
 warehause = db.dbget()
 
-# for i in range(len(wh)):
-#   warehause.append(wh.item(name=wh['Name'].values[i], category=wh['Category'].values[i], price=wh['Price'].values[i], currency=wh['Currency'].values[i], count=wh['Count'].values[i]))
-
 app = FastAPI()
+
 
 @app.get("/")
 async def index():
     """Добро пожаловать."""
     return {"message": "Welcome to the warehouse API"}
 
-
 @app.get("/items/", response_model=list[wh.item])
 async def items(
-   id: int = Query(None, description="ID товара."),
-   name: str = Query(None, description="Название товара."),
-   category: str = Query(None, description="Категория товара."),
-   price: int = Query(None, description="Цена товара."),
-   currency: str = Query(None, description="Валюта товара."),
-   count: int = Query(None, description="Количество товара.")
+    item_id: int = Query(None, description="ID товара."),
+    name: str = Query(None, description="Название товара."),
+    category: str = Query(None, description="Категория товара."),
+    available: bool = Query(False, description="Проверить наличие товара."),
+    is_max_price: bool = Query(False, description="Получить товар с максимальной ценой."),
 ):
     """Получить список товаров."""
     result = warehause
     if name is not None:
         result = [item for item in result if name in item.name]
+    if item_id is not None:
+        result = [item for item in result if  item.id == item_id]
     if category is not None:
         result = [item for item in result if category in item.category]
-    if price is not None:
-        result = [item for item in result if item.price == price]
-    if currency is not None:
-        result = [item for item in result if item.currency == currency]
-    if count is not None:
-        result = [item for item in result if item.count == count]
+    if available:
+        result = [item for item in result if item.count > 0]
+    if is_max_price:
+        price = 0
+        for i in range(len(result)):
+            if result[i].price > price:
+                price = result[i].price
+                rez = result[i]
+        result = [rez]
 
     return result
 
-@app.get("/items/add/", response_model=str)
+@app.get("/items/{item_id}/{to_currency}/", response_model=wh.item)
+async def get_item(
+    item_id: int,
+    to_currency: str
+):
+    """Получить товар."""
+    item = [item for item in warehause if item.id == item_id][0]
+    response = requests.get(f'https://api.frankfurter.dev/v2/rate/{item.currency}/{to_currency}')
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"{item.currency}/{to_currency} not found")
+
+    rate = response.json()['rate']
+    item.price = item.price * rate
+    item.currency = to_currency
+    return item
+
+
+
+@app.post("/items/add/", response_model=wh.item)
 async def add_item(
    name: str = Query(None, description="Название товара."),
    category: str = Query(None, description="Категория товара."),
@@ -244,42 +242,84 @@ async def add_item(
    count: int = Query(None, description="Количество товара.")
 ):
     """Добавить товар."""
-    id = db.dbadd(name=name, category=category, price=price, currency=currency, count=count)
-    if id == -1:
-        raise HTTPException(status_code=400, detail="Bad Request")
-    new_item = wh.item(name=name, category=category, price=price, currency=currency, count=count, id=id)
+    try:
+        idd = db.dbadd(
+            name=name,
+            category=category,
+            price=price,
+            currency=currency,
+            count=count
+        )
+    except Exception as e: # ! fix
+        print(e)
+        # if e == 'UNIQUE constraint failed':
+        raise HTTPException(status_code=409, detail="Conflict")
+
+    new_item = wh.item(
+        name=name,
+        category=category,
+        price=price,
+        currency=currency,
+        count=count,
+        id=idd
+    )
     warehause.append(new_item)
 
-    return f'Добавлен товар с id={id}' #
+    return new_item
 
-@app.get("/items/del/", response_model=str)
-async def del_item(
-   id: int = Query(None, description="ID товара.")
-):
+
+@app.delete("/items/delete/{item_id}/", response_model=str)
+async def del_item(item_id: int):
     """Удалить товар."""
-    #new_item = wh.item(name=name, category=category, price=price, currency=currency, count=count)
-    #warehause.remove(warehause)
-    db.dbdel(id=id)
-    warehause = db.dbget()
-    return f'Удален товар с id={id}'
+    print(item_id)
+    db.dbdel(item_id)
+    try:
+        warehause.remove([item for item in warehause if item.id == item_id])
+    except:
+        raise HTTPException(status_code=400, detail="Bad Request")
+    return f'Удален товар с id={item_id}'
 
-@app.get("/items/modify/", response_model=list[wh.item])
-async def modify_item(
-   id: int = Query(None, description="ID товара."),
-   name: str = Query(None, description="Название товара."),
-   category: str = Query(None, description="Категория товара."),
-   price: int = Query(None, description="Цена товара."),
-   currency: str = Query(None, description="Валюта товара."),
-   count: int = Query(None, description="Количество товара.")
+
+@app.put("/items/update/{item_id}/", response_model=wh.item)
+async def update_item(
+    item_id: int,
+    name: str = Query(None, description="Название товара."),
+    category: str = Query(None, description="Категория товара."),
+    price: int = Query(None, description="Цена товара."),
+    currency: str = Query(None, description="Валюта товара."),
+    count: int = Query(None, description="Количество товара.")
 ):
     """Изменить товар."""
-    #new_item = wh.item(name=name, category=category, price=price, currency=currency, count=count)
-    #warehause.append(new_item)
-    db.dbmodify(id=id, name=name, category=category, price=price, currency=currency, count=count)
-    #! поправить
-    warehause = db.dbget()
+    try:
+        db.dbupdate(
+            item_id = item_id,
+            name = name,
+            category = category,
+            price = price,
+            currency = currency,
+            count = count
+        )
+        warehause = db.dbget()
+    except Exception as e:
+        print (e)
+        raise HTTPException(status_code=409, detail="Conflict")
+    except:
+        raise HTTPException(status_code=400, detail="Bad Request")
 
-    return warehause
+    rezult = [item for item in warehause if item.id == item_id]
+    return rezult[0]
+
 
 if __name__ == "__main__":
-  uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+
+
+#   {
+#     "id": 9,
+#     "name": "www33",
+#     "category": "a",
+#     "price": 12,
+#     "currency": "ru",
+#     "count": 1
+#   },
