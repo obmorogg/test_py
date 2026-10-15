@@ -155,18 +155,19 @@ from fastapi.exceptions import HTTPException
 # import pandas as pd
 import warehause as wh
 import db_operate as db
+from typing import Literal
 
 import requests
 
 # https://api.frankfurter.dev/v2/currencies
 
-currencies = requests.get('https://api.frankfurter.dev/v2/currencies').json()
+# currencies = requests.get('https://api.frankfurter.dev/v2/currencies').json()
 # print(currencies)
 # for currency in currencies:
-#     print(currency['iso_code'])
+#     print(f'"{currency["iso_code"]}",')
 
 
-#exit()
+# exit()
 
 
 # wh = pd.read_csv('warehouse.csv', sep=';')
@@ -218,7 +219,7 @@ async def items(
 @app.get("/items/{item_id}/{to_currency}/", response_model=wh.item)
 async def get_item(
     item_id: int,
-    to_currency: str
+    to_currency: Literal["AED","AFN","ALL","AMD","ANG","AOA","ARS","AUD","AWG","AZN","BAM","BBD","BDT","BHD","BIF","BMD","BND","BOB","BRL","BSD","BTN","BWP","BYN","BZD","CAD","CDF","CHF","CLP","CMD","CNH","CNY","COP","CRC","CUP","CVE","CZK","DJF","DKK","DOP","DZD","EGP","ERN","ETB","EUR","FJD","FKP","GBP","GEL","GGP","GHS","GIP","GMD","GNF","GTQ","GYD","HKD","HNL","HTG","HUF","IDR","ILS","IMP","INR","IQD","IRR","ISK","JEP","JMD","JOD","JPY","KES","KGS","KHR","KMF","KPW","KRW","KWD","KYD","KZT","LAK","LBP","LKR","LRD","LSL","LYD","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MRU","MUR","MVR","MWK","MXN","MYR","MZN","NAD","NGN","NIO","NOK","NPR","NZD","OMR","PAB","PEN","PGK","PHP","PKR","PLN","PYG","QAR","RON","RSD","RUB","RWF","SAR","SBD","SCR","SDG","SEK","SGD","SHP","SLE","SOS","SRD","SSP","STN","SVC","SYP","SZL","THB","TJS","TMT","TND","TOP","TRY","TTD","TWD","TZS","UAH","UGX","USD","UYU","UZS","VES","VND","VUV","WST","XAF","XAG","XAU","XCD","XCG","XDR","XOF","XPD","XPF","XPT","YER","ZAR","ZMW","ZWG"]
 ):
     """Получить товар."""
     item = [item for item in warehause if item.id == item_id][0]
@@ -313,13 +314,3 @@ async def update_item(
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
 
-
-
-#   {
-#     "id": 9,
-#     "name": "www33",
-#     "category": "a",
-#     "price": 12,
-#     "currency": "ru",
-#     "count": 1
-#   },
